@@ -14,12 +14,8 @@ type Props = {};
 // utility function to search for listings in real estate website
 function urlForQueryAndPage(key, value, pageNumber) {
     const data = {
-        country: 'uk',
-        pretty: '1',
-        encoding: 'json',
-        listing_type: 'buy',
-        action: 'search_listings',
         page: pageNumber,
+        pagesize: 50,
     };
     data[key] = value;
 
@@ -27,7 +23,7 @@ function urlForQueryAndPage(key, value, pageNumber) {
     .map(key => key + '=' + encodeURIComponent(data[key]))
     .join('&');
 
-    return 'https://api.nestoria.co.uk/api?' + querystring;
+    return 'https://api.gateway.attomdata.com/propertyapi/v1.0.0/property/address?' + querystring;
 }
 
 export default class SearchPage extends Component<Props> {
@@ -38,8 +34,9 @@ export default class SearchPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.state = {
-            searchString: 'Type in city name',
+            searchString: '82009',
             isLoading: false,
+            message: '',
         };
     }
     _onSearchTextChanged = (event) => {
@@ -49,12 +46,31 @@ export default class SearchPage extends Component<Props> {
     };
 
     _executeQuery = (query) => {
-        console.log(query);
         this.setState({ isLoading: true });
+        fetch(query, {headers: {
+    Accept: 'application/json', apikey: '48ed381483aabf5758717c7aa023980f'}})
+        .then(response => response.json())
+        .then(json => this._handleResponse(json))
+        .catch(error =>
+            this.setState({
+                isLoading: false,
+                message: 'Something bad happened ' + error
+            }));
     }
 
+    _handleResponse = (response) => {
+        debugger;
+        this.setState({ isLoading: false, message: ''});
+        if (response.status.msg === 'SuccessWithResult') {
+            console.log('Properties found: ' + response.property.length);
+        } else {
+            this.setState({ message: 'Location not recognized; please try again.'});
+            }
+        };
+
+
     _onSearchPressed = () => {
-        const query = urlForQueryAndPage('place_name',
+        const query = urlForQueryAndPage('postalcode',
     this.state.searchString, 1);
     this._executeQuery(query);
     };
@@ -85,6 +101,7 @@ export default class SearchPage extends Component<Props> {
                 <Image source={require('./Resources/house.png')}
                        style={styles.image} />
                 {spinner}
+                <Text style={styles.description}>{this.state.message}</Text>
             </View>
         );
     }
