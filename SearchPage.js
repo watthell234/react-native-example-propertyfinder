@@ -62,7 +62,8 @@ export default class SearchPage extends Component<Props> {
         debugger;
         this.setState({ isLoading: false, message: ''});
         if (response.status.msg === 'SuccessWithResult') {
-            console.log('Properties found: ' + response.property.length);
+            this.props.navigation.navigate( 'Results', { property: response.property});
+            console.log('Properties found: ' + response.property);
         } else {
             this.setState({ message: 'Location not recognized; please try again.'});
             }
