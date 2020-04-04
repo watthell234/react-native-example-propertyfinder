@@ -14,8 +14,9 @@ type Props = {};
 // utility function to search for listings in real estate website
 function urlForQueryAndPage(key, value, pageNumber) {
     const data = {
+        propertytype: 'CONDOMINIUM',
         page: pageNumber,
-        pagesize: 50,
+        pagesize: 500,
     };
     data[key] = value;
 
@@ -63,7 +64,6 @@ export default class SearchPage extends Component<Props> {
         this.setState({ isLoading: false, message: ''});
         if (response.status.msg === 'SuccessWithResult') {
             this.props.navigation.navigate( 'Results', { property: response.property});
-            console.log('Properties found: ' + response.property);
         } else {
             this.setState({ message: 'Location not recognized; please try again.'});
             }
@@ -84,7 +84,7 @@ export default class SearchPage extends Component<Props> {
                     Search for houses to buy!
                 </Text>
                 <Text style={styles.description}>
-                    Search by place-name or postcode.
+                    Search by postcode.
                 </Text>
                 <View style={styles.flowRight}>
                     <TextInput
@@ -92,7 +92,7 @@ export default class SearchPage extends Component<Props> {
                         style={styles.searchInput}
                         value={this.state.searchString}
                         onChange={this._onSearchTextChanged}
-                        placeholder='Search via name or postcode'/>
+                        placeholder='Search via postcode'/>
                     <Button
                         onPress={() => {}}
                         color='#48BBEC'
